@@ -1,7 +1,7 @@
 # URL Shortener Application
 Простое приложение для сокращения длинных URL-адресов.
 
-##Технологии
+## Технологии
 - Backend: Java 17, Spring Boot 3
 
 - База данных: PostgreSQL
