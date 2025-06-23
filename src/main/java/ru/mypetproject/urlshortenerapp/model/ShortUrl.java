@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class ShortUrl {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int Id;
+    public int id;
     @Column(nullable = false, unique = true)
     public String originalUrl;
     @Column(nullable = false)

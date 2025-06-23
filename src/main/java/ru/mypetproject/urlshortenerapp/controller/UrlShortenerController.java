@@ -11,6 +11,7 @@ import ru.mypetproject.urlshortenerapp.service.UrlShortenerService;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +23,12 @@ public class UrlShortenerController {
     public ResponseEntity<String> shorten(@Valid @RequestBody ShortenRequest request) {
         String shortKey = service.ShortenUrl(request.getUrl());
         return ResponseEntity.ok(shortKey);
+    }
+
+    @GetMapping("/getall")
+    public ResponseEntity<List<ShortUrl>> getAll() {
+        List<ShortUrl> urls = service.getAllUrls();
+        return ResponseEntity.ok(urls);
     }
 
     @GetMapping("{code}")
