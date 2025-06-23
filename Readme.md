@@ -1,6 +1,14 @@
 # URL Shortener Application
 Простое приложение для сокращения длинных URL-адресов.
 
+##Технологии
+- Backend: Java 17, Spring Boot 3
+
+- База данных: PostgreSQL
+
+- Библиотеки: Lombok, Hibernate
+
+
 ## Возможности
 - Сокращение длинных URL в короткие ключи (например, https://example.com → /abc123)
 
