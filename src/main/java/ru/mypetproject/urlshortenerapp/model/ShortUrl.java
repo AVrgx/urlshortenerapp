@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -25,5 +27,11 @@ public class ShortUrl {
     LocalDateTime createdAt;
 
     LocalDateTime expiresAt;
+
+    @Column(nullable = false)
+    private int clickCount = 0;
+
+    @OneToMany(mappedBy = "shortUrl", cascade = CascadeType.ALL)
+    private List<UrlClick> clicks = new ArrayList<>();
 
 }
