@@ -1,7 +1,9 @@
 package ru.mypetproject.urlshortenerapp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mypetproject.urlshortenerapp.model.ShortUrl;
 import ru.mypetproject.urlshortenerapp.repository.ShortUrlRepository;
 
@@ -60,5 +62,12 @@ public class UrlShortenerService {
             code.append(chars.charAt(index));
         }
         return code.toString();
+    }
+
+    // Очистка просроченных ссылок
+    @Scheduled(cron = "0 0 3 * * ?") // Каждый день в 3:00 ночи
+    @Transactional
+    public void cleanupExpiredUrls() {
+        repository.deleteByExpiresAtBefore(LocalDateTime.now());
     }
 }
