@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +29,11 @@ public class UrlShortenerService {
     private static final int SHORT_KEY_LENGTH = 6;
     private final UrlClickRepository urlClickRepository;
     private final ShortUrlRepository shortUrlRepository;
+    @Value("${url.shortener.default-ttl-days}")
+    private int defaultTtlDays;
 
-    public String ShortenUrl(String originalUrl, Integer ttlDays) {
+    @Transactional
+    public String shortenUrl(String originalUrl, Integer ttlDays) {
         Optional<ShortUrl> existingUrl = repository.findByOriginalUrl(originalUrl);
         if (existingUrl.isPresent()) {
             return existingUrl.get().getShortKey();
@@ -42,6 +46,7 @@ public class UrlShortenerService {
            shortUrl.setShortKey(shortKey);
            shortUrl.setOriginalUrl(originalUrl);
            shortUrl.setCreatedAt(LocalDateTime.now());
+           shortUrl.setExpiresAt(LocalDateTime.now().plusDays(defaultTtlDays));
 
             if (ttlDays != null) {
                 shortUrl.setExpiresAt(LocalDateTime.now().plusDays(ttlDays));

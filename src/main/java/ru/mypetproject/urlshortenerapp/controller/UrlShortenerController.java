@@ -1,7 +1,6 @@
 package ru.mypetproject.urlshortenerapp.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,7 @@ public class UrlShortenerController {
 
     @PostMapping("/shorten")
     public ResponseEntity<String> shorten(@Valid @RequestBody ShortenRequest request) {
-        String shortKey = service.ShortenUrl(request.getUrl(), request.getTtlDays());
+        String shortKey = service.shortenUrl(request.getUrl(), request.getTtlDays());
         return ResponseEntity.ok(shortKey);
     }
 
