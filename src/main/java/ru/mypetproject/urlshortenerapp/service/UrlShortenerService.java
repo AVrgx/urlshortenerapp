@@ -56,13 +56,25 @@ public class UrlShortenerService {
     }
 
     public Optional<String> getOriginalUrl(String shortKey, HttpServletRequest request) {
-        return repository.findByShortKey(shortKey)
-                .filter(url ->url.getExpiresAt() == null
-                || LocalDateTime.now().isBefore(url.getExpiresAt()))
-                .map(url -> {
-                    trackClick(url, request);
-                    return url.getOriginalUrl();
+        log.debug("Поиск ссылки для shortKey: {}", shortKey);
+        Optional<ShortUrl> urlOpt = repository.findByShortKey(shortKey)
+                .filter(url -> {
+                    boolean valid = url.getExpiresAt() == null
+                                    || LocalDateTime.now().isBefore(url.getExpiresAt());
+                    if (!valid) {
+                        log.debug("Ссылка просрочена: {}", url.getShortKey());
+                    }
+                    return valid;
                 });
+
+        if (urlOpt.isEmpty()) {
+            log.debug("Ссылка не найдена или просрочена для key: {}", shortKey);
+        }
+
+        return urlOpt.map(url -> {
+            trackClick(url, request);
+            return url.getOriginalUrl();
+        });
     }
 
     private void trackClick(ShortUrl shortUrl, HttpServletRequest request) {
