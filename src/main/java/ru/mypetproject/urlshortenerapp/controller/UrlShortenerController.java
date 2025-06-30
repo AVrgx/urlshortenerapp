@@ -21,7 +21,7 @@ public class UrlShortenerController {
 
     @PostMapping("/shorten")
     public ResponseEntity<String> shorten(@Valid @RequestBody ShortenRequest request) {
-        String shortKey = service.ShortenUrl(request.getUrl());
+        String shortKey = service.ShortenUrl(request.getUrl(), request.getTtlDays());
         return ResponseEntity.ok(shortKey);
     }
 
