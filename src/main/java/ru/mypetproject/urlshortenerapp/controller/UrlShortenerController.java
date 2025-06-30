@@ -40,7 +40,7 @@ public class UrlShortenerController {
                 .orElse(ResponseEntity.notFound().build());
 
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable int id) {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
