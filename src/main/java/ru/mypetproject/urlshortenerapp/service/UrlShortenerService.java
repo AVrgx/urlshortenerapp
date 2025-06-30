@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.mypetproject.urlshortenerapp.dto.ClickInfo;
 import ru.mypetproject.urlshortenerapp.dto.UrlStatsResponse;
 import ru.mypetproject.urlshortenerapp.model.ShortUrl;
 import ru.mypetproject.urlshortenerapp.model.UrlClick;

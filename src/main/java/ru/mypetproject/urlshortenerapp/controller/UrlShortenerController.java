@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.mypetproject.urlshortenerapp.dto.ClickInfo;
 import ru.mypetproject.urlshortenerapp.dto.ShortenRequest;
+import ru.mypetproject.urlshortenerapp.dto.UrlStatsResponse;
 import ru.mypetproject.urlshortenerapp.model.ShortUrl;
 import ru.mypetproject.urlshortenerapp.service.UrlShortenerService;
 import java.net.URI;
@@ -50,7 +52,7 @@ public class UrlShortenerController {
     public ResponseEntity<UrlStatsResponse> getStats(@PathVariable String shortKey) {
         return service.getStats(shortKey)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build);
+                .orElse(ResponseEntity.notFound().build());
     }
     @GetMapping("/{shortKey}/clicks")
     public ResponseEntity<List<ClickInfo>> getClickDetails(@PathVariable String shortKey) {
