@@ -46,5 +46,15 @@ public class UrlShortenerController {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/{shortKey}/stats")
+    public ResponseEntity<UrlStatsResponse> getStats(@PathVariable String shortKey) {
+        return service.getStats(shortKey)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build);
+    }
+    @GetMapping("/{shortKey}/clicks")
+    public ResponseEntity<List<ClickInfo>> getClickDetails(@PathVariable String shortKey) {
+        return ResponseEntity.ok(service.getClickDetails(shortKey));
+    }
 
 }
