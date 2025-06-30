@@ -1,5 +1,7 @@
 package ru.mypetproject.urlshortenerapp.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,8 +32,9 @@ public class UrlShortenerController {
     }
 
     @GetMapping("{code}")
-    public ResponseEntity<Void> redirect(@PathVariable String code) {
-        return service.getOriginalUrl(code)
+    public ResponseEntity<Void> redirect(@PathVariable String code, HttpServletRequest request) {
+        // Позволяет получить информацию о клиенте (IP, браузер)
+        return service.getOriginalUrl(code, request)
                 .map(originalUrl-> ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))
                         .<Void>build())

@@ -1,5 +1,6 @@
 package ru.mypetproject.urlshortenerapp.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mypetproject.urlshortenerapp.model.ShortUrl;
+import ru.mypetproject.urlshortenerapp.model.UrlClick;
 import ru.mypetproject.urlshortenerapp.repository.ShortUrlRepository;
+import ru.mypetproject.urlshortenerapp.repository.UrlClickRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +22,7 @@ public class UrlShortenerService {
     private static final Logger log = LoggerFactory.getLogger(UrlShortenerService.class);
     private final ShortUrlRepository repository;
     private static final int SHORT_KEY_LENGTH = 6;
+    private final UrlClickRepository urlClickRepository;
 
     public String ShortenUrl(String originalUrl, Integer ttlDays) {
         Optional<ShortUrl> existingUrl = repository.findByOriginalUrl(originalUrl);
@@ -46,13 +50,28 @@ public class UrlShortenerService {
         return repository.findAll();
     }
 
-    public Optional<String> getOriginalUrl(String shortKey) {
+    public Optional<String> getOriginalUrl(String shortKey, HttpServletRequest request) {
         return repository.findByShortKey(shortKey)
                 .filter(url ->url.getExpiresAt() == null
                 || LocalDateTime.now().isBefore(url.getExpiresAt()))
-                .map(ShortUrl::getOriginalUrl);
+                .map(url -> {
+                    trackClick(url, request);
+                    return url.getOriginalUrl();
+                });
     }
 
+    private void trackClick(ShortUrl shortUrl, HttpServletRequest request) {
+        // Увеличиваем счётчик
+        shortUrl.setClickCount(shortUrl.getClickCount() + 1);
+        // Сохраняем детали клика
+        UrlClick click = new UrlClick(
+                shortUrl,
+                request.getRemoteAddr(),               // IP
+                request.getHeader("User-Agent")    // Browser
+        );
+        urlClickRepository.save(click);
+    }
+    // Обновляем ссылку (чтобы clickCount сохранился)
     public void deleteById(int Id) {
         repository.deleteById((long) Id);
     }
