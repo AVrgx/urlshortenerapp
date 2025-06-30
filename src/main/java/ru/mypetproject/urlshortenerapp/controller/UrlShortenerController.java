@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.mypetproject.urlshortenerapp.dto.ShortenRequest;
 import ru.mypetproject.urlshortenerapp.model.ShortUrl;
 import ru.mypetproject.urlshortenerapp.service.UrlShortenerService;
-
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 

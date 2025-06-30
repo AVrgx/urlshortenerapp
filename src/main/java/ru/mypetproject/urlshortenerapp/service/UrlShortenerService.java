@@ -1,6 +1,8 @@
 package ru.mypetproject.urlshortenerapp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UrlShortenerService {
+    private static final Logger log = LoggerFactory.getLogger(UrlShortenerService.class);
     private final ShortUrlRepository repository;
     private static final int SHORT_KEY_LENGTH = 6;
 
@@ -68,6 +71,7 @@ public class UrlShortenerService {
     @Scheduled(cron = "0 0 3 * * ?") // Каждый день в 3:00 ночи
     @Transactional
     public void cleanupExpiredUrls() {
-        repository.deleteByExpiresAtBefore(LocalDateTime.now());
+        int deletedCount = repository.deleteByExpiresAtBefore(LocalDateTime.now());
+        log.info("Удалено {} просроченных ссылок", deletedCount);
     }
 }
