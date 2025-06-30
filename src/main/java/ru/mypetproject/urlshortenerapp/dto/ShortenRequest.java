@@ -13,4 +13,6 @@ public class ShortenRequest {
     @Size(max = 2048, message = "Длинна не должна превышать 2048 символов")
     @Pattern(regexp = "^(https?://).*", message = "URL должен начинаться с http:// или https://")
     private String url;
+
+    private Integer ttlDays;
 }
