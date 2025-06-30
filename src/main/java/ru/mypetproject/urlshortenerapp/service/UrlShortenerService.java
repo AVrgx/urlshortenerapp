@@ -15,7 +15,7 @@ public class UrlShortenerService {
     private final ShortUrlRepository repository;
     private static final int SHORT_KEY_LENGTH = 6;
 
-    public String ShortenUrl(String originalUrl) {
+    public String ShortenUrl(String originalUrl, Integer ttlDays) {
         Optional<ShortUrl> existingUrl = repository.findByOriginalUrl(originalUrl);
         if (existingUrl.isPresent()) {
             return existingUrl.get().getShortKey();
@@ -28,6 +28,10 @@ public class UrlShortenerService {
            shortUrl.setShortKey(shortKey);
            shortUrl.setOriginalUrl(originalUrl);
            shortUrl.setCreatedAt(LocalDateTime.now());
+
+            if (ttlDays != null) {
+                shortUrl.setExpiresAt(LocalDateTime.now().plusDays(ttlDays));
+            }
            repository.save(shortUrl);
            return shortKey;
 
@@ -36,8 +40,11 @@ public class UrlShortenerService {
     public List<ShortUrl> getAllUrls() {
         return repository.findAll();
     }
+
     public Optional<String> getOriginalUrl(String shortKey) {
         return repository.findByShortKey(shortKey)
+                .filter(url ->url.getExpiresAt() == null
+                || LocalDateTime.now().isBefore(url.getExpiresAt()))
                 .map(ShortUrl::getOriginalUrl);
     }
 
