@@ -7,14 +7,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.mypetproject.urlshortenerapp.dto.UrlStatsResponse;
 import ru.mypetproject.urlshortenerapp.model.ShortUrl;
 import ru.mypetproject.urlshortenerapp.model.UrlClick;
 import ru.mypetproject.urlshortenerapp.repository.ShortUrlRepository;
 import ru.mypetproject.urlshortenerapp.repository.UrlClickRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class UrlShortenerService {
     private final ShortUrlRepository repository;
     private static final int SHORT_KEY_LENGTH = 6;
     private final UrlClickRepository urlClickRepository;
+    private final ShortUrlRepository shortUrlRepository;
 
     public String ShortenUrl(String originalUrl, Integer ttlDays) {
         Optional<ShortUrl> existingUrl = repository.findByOriginalUrl(originalUrl);
@@ -92,5 +96,43 @@ public class UrlShortenerService {
     public void cleanupExpiredUrls() {
         int deletedCount = repository.deleteByExpiresAtBefore(LocalDateTime.now());
         log.info("Удалено {} просроченных ссылок", deletedCount);
+    }
+
+    public Optional<UrlStatsResponse> getStats(String shortKey) {
+        return shortUrlRepository.findByShortKey(shortKey)
+                .map(url -> new UrlStatsResponse(
+                        url.getShortKey(),
+                        url.getOriginalUrl(),
+                        url.getClickCount(),
+                        url.getClicks().stream()
+                                .map(UrlClick::getClickedAt)
+                                .max(LocalDateTime::compareTo)
+                                .orElse(null)
+                ));
+    }
+    public List<ClickInfo> getClickDetails(String shortKey) {
+        return shortUrlRepository.findByShortKey(shortKey)
+                .map(url -> url.getClicks().stream()
+                        .map(click -> new ClickInfo(
+                                click.getClickedAt(),
+                                click.getIpAddress(),
+                                extractDeviceInfo(click.getUserAgent())
+                        ))
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    private String extractDeviceInfo(String userAgent) {
+        // Упрощённый парсинг User-Agent
+        if (userAgent == null) return "Unknown";
+
+        if (userAgent.contains("Mobile")) {
+            return "Mobile";
+        } else if (userAgent.contains("Mac OS")) {
+            return "Mac";
+        } else if (userAgent.contains("Windows")) {
+            return "Windows";
+        }
+        return "Other";
     }
 }
