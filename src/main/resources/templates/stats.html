@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Статистика URL</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1>Статистика</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Короткий URL</th>
+            <th>Оригинальный URL</th>
+            <th>Создан</th>
+            <th>Клики</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="url : ${urls}">
+            <td th:text="${url.shortKey}"></td>
+            <td th:text="${url.originalUrl}"></td>
+            <td th:text="${url.createdAt}"></td>
+            <td th:text="${url.clickCount}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
