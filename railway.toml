@@ -1,4 +1,6 @@
 [build]
-builder = "maven"
 command = "./mvnw clean package -DskipTests"
 start = "java -jar target/app.jar"
+
+[deploy]
+use_nixpacks = false
