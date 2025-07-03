@@ -1,5 +1,6 @@
 package ru.mypetproject.urlshortenerapp.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,10 +23,20 @@ public class WebController {
     }
 
     @PostMapping("/shorten")
-    public String shortenUrl(@RequestParam("url") String url, @RequestParam(value = "ttlDays", defaultValue = "30") int ttlDays, Model model) {
+    public String shortenUrl(
+            HttpServletRequest request,
+            @RequestParam("url") String url,
+            @RequestParam(value = "ttlDays", defaultValue = "30") int ttlDays,
+            Model model) {
+
         try {
             String shortKey = service.shortenUrl(url, ttlDays);
-            model.addAttribute("shortUrl", "http://localhost:8080/api/" + shortKey);
+
+            String baseUrl = request.getScheme() + "://" + request.getServerName() +
+                             ":" + request.getServerPort();
+            String shortUrl = baseUrl + "/api/" + shortKey;
+
+            model.addAttribute("shortUrl", shortUrl);
             model.addAttribute("success", true);
         } catch (Exception e) {
             model.addAttribute("error", "Ошибка: " + e.getMessage());
